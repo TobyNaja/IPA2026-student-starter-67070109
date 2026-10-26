@@ -16,6 +16,27 @@ from app.backends.common import (
 
 IF_NS = "urn:ietf:params:xml:ns:yang:ietf-interfaces"
 IP_NS = "urn:ietf:params:xml:ns:yang:ietf-ip"
+NATIVE_NS = "http://cisco.com/ns/yang/Cisco-IOS-XE-native"
+
+# IOS-XE keeps the existing primary address when a new one arrives through the
+# native model, even under nc:operation="replace", so clear the old address in
+# the same session before applying the desired configuration.
+REMOVE_ADDRESS_CONFIG = """
+<config
+    xmlns="urn:ietf:params:xml:ns:netconf:base:1.0"
+    xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
+  <native xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-native">
+    <interface>
+      <Loopback>
+        <name>{number}</name>
+        <ip>
+          <address nc:operation="remove"/>
+        </ip>
+      </Loopback>
+    </interface>
+  </native>
+</config>
+"""
 
 STATUS_FILTER = """
 <interfaces xmlns="urn:ietf:params:xml:ns:yang:ietf-interfaces">
@@ -94,11 +115,38 @@ def _real_get_config(router, filter_xml):
     )
 
 
+def _config_loopback_number(config_xml):
+    """Read the Loopback key out of an apply document, or None."""
+    try:
+        root = ET.fromstring(config_xml)
+    except ET.ParseError:
+        return None
+
+    name = root.find(f".//{{{NATIVE_NS}}}Loopback/{{{NATIVE_NS}}}name")
+    if name is None or name.text is None:
+        return None
+    return name.text.strip()
+
+
 def _real_edit_config(router, config_xml):
-    return _run(
-        router,
-        lambda m: m.edit_config(target="running", config=config_xml),
-    )
+    from ncclient.operations.rpc import RPCError
+
+    number = _config_loopback_number(config_xml)
+
+    def operation(m):
+        if number is not None:
+            try:
+                m.edit_config(
+                    target="running",
+                    config=REMOVE_ADDRESS_CONFIG.format(number=number),
+                )
+            except RPCError:
+                # Having no address to remove is the normal create path.
+                pass
+
+        return m.edit_config(target="running", config=config_xml)
+
+    return _run(router, operation)
 
 
 def _text(element, path):
