@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IPA2026 Bot Explorer</title>
+  <meta name="description" content="คู่มือศึกษา Webex bot ของ IPA2026-student-starter-67070109: function, workflow, YAML และข้อสอบ">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+  <script>
+    // apply saved theme before first paint
+    try {
+      var t = localStorage.getItem("ipa-study.theme");
+      if (t) document.documentElement.setAttribute("data-theme", JSON.parse(t));
+    } catch (e) {}
+  </script>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar" aria-label="เมนูหลัก">
+      <div class="brand">
+        <div class="brand-mark">IPA</div>
+        <div>
+          <div class="brand-title">IPA2026 Bot Explorer</div>
+          <div class="brand-sub">student-starter-67070109</div>
+        </div>
+      </div>
+      <nav class="nav" id="nav"></nav>
+      <div class="side-foot">
+        <div class="side-progress" id="sideProgress"></div>
+        <button class="theme-btn" id="themeBtn" type="button">โหมดสี: อัตโนมัติ</button>
+        <div id="sideMeta"></div>
+      </div>
+    </aside>
+    <div class="scrim" id="scrim"></div>
+    <div class="main-wrap">
+      <header class="topbar">
+        <button class="icon-btn" id="menuBtn" type="button" aria-label="เปิดเมนู">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <div class="title" id="topTitle">IPA2026 Bot Explorer</div>
+      </header>
+      <main class="main" id="main">
+        <div class="container" id="view"></div>
+      </main>
+    </div>
+  </div>
+
+  <!-- data is kept separate from the UI -->
+  <script src="data/project-data.js"></script>
+  <script src="data/quiz-data.js"></script>
+  <script src="data/source-snippets.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
